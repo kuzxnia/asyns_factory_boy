@@ -32,6 +32,12 @@ class TestSQLAlchemyPkSequence:
         assert 'foo1' == std1.foo
         assert 'foo2' == std2.foo
 
+    async def test_pk_many_batch(self):
+        stds = await StandardFactory.build_batch(3)
+        assert 'foo1' == stds[0].foo
+        assert 'foo2' == stds[1].foo
+        assert 'foo3' == stds[2].foo
+
     async def test_pk_creation(self):
         std1 = await StandardFactory.create()
         assert 'foo1' == std1.foo
@@ -41,6 +47,12 @@ class TestSQLAlchemyPkSequence:
         std2 = await StandardFactory.create()
         assert 'foo0' == std2.foo
         assert 0 == std2.id
+
+    async def test_pk_creation_batch(self):
+        stds = await StandardFactory.create_batch(3)
+        assert 'foo1' == stds[0].foo
+        assert 'foo2' == stds[1].foo
+        assert 'foo3' == stds[2].foo
 
     async def test_pk_force_value(self):
         std1 = await StandardFactory.create(id=10)

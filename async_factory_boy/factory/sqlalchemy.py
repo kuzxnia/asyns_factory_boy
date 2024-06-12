@@ -3,7 +3,7 @@ import inspect
 from inspect import isawaitable
 from typing import Any, Optional
 
-from factory import errors, Factory, FactoryError
+from factory import BUILD_STRATEGY, errors, Factory, FactoryError
 from factory.alchemy import SQLAlchemyOptions
 from factory.builder import (BuildStep, DeclarationSet, parse_declarations, Resolver, StepBuilder)
 from sqlalchemy import select
@@ -113,6 +113,14 @@ class AsyncSQLAlchemyFactory(Factory):
 
         step = AsyncStepBuilder(cls._meta, params, strategy)
         return await step.build()
+
+    @classmethod
+    async def build(cls, **kwargs):
+        return await cls._generate(strategy=BUILD_STRATEGY, params=kwargs)
+
+    @classmethod
+    async def build_batch(cls, size, **kwargs):
+        return [await cls.build(**kwargs) for _ in range(size)]
 
     @classmethod
     async def create(cls, **kwargs):
