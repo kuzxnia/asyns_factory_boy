@@ -1,13 +1,16 @@
 import asyncio
 import inspect
+from typing import List, TypeVar
 
 from factory import Factory, FactoryError
 from factory.alchemy import SQLAlchemyOptions
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
+_T = TypeVar("_T")
 
-class AsyncSQLAlchemyFactory(Factory):
+
+class AsyncSQLAlchemyFactory(Factory[_T]):
     _options_class = SQLAlchemyOptions
 
     @classmethod
@@ -18,7 +21,7 @@ class AsyncSQLAlchemyFactory(Factory):
         return super()._generate(strategy, params)
 
     @classmethod
-    async def create(cls, **kwargs):
+    async def create(cls, **kwargs) -> _T:
         session = cls._meta.sqlalchemy_session
 
         instance = await super().create(**kwargs)
@@ -47,7 +50,7 @@ class AsyncSQLAlchemyFactory(Factory):
         return asyncio.create_task(maker_coroutine())
 
     @classmethod
-    async def create_batch(cls, size, **kwargs):
+    async def create_batch(cls, size, **kwargs) -> List[_T]:
         return [await cls.create(**kwargs) for _ in range(size)]
 
     @classmethod
