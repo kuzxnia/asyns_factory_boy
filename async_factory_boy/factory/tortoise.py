@@ -1,10 +1,13 @@
 import inspect
+from typing import List, TypeVar
 
 import factory
 from factory.builder import BuildStep, StepBuilder, parse_declarations
 
+_T = TypeVar("_T")
 
-class AsyncTortoiseFactory(factory.Factory):
+
+class AsyncTortoiseFactory(factory.Factory[_T]):
     @classmethod
     async def _generate(cls, strategy, params):
         if cls._meta.abstract:
@@ -25,7 +28,7 @@ class AsyncTortoiseFactory(factory.Factory):
         return await model_class.create(*args, **kwargs)
 
     @classmethod
-    async def create_batch(cls, size, **kwargs):
+    async def create_batch(cls, size, **kwargs) -> List[_T]:
         return [await cls.create(**kwargs) for _ in range(size)]
 
     @classmethod
